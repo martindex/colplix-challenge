@@ -23,13 +23,13 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
      * @return Cantidad total de subordinados.
      */
     @Query(value = """
-        WITH RECURSIVE Subordinates AS (
+        WITH RECURSIVE subordinates_cte(id) AS (
             SELECT id FROM employees WHERE supervisor_id = :id
             UNION ALL
             SELECT e.id FROM employees e
-            INNER JOIN Subordinates s ON e.supervisor_id = s.id
+            INNER JOIN subordinates_cte s ON e.supervisor_id = s.id
         )
-        SELECT COUNT(*) FROM Subordinates
+        SELECT COUNT(*) FROM subordinates_cte
         """, nativeQuery = true)
     long countSubordinates(@Param("id") Long id);
 }
