@@ -24,11 +24,21 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     /**
-     * Endpoint para registrar o actualizar un empleado.
+     * Endpoint para registrar un nuevo empleado.
      */
     @PostMapping
-    public ResponseEntity<EmployeeResponse> saveOrUpdate(@Valid @RequestBody EmployeeRequest request) {
-        return ResponseEntity.ok(employeeService.saveOrUpdate(request));
+    public ResponseEntity<EmployeeResponse> create(@Valid @RequestBody EmployeeRequest request) {
+        return ResponseEntity.ok(employeeService.create(request));
+    }
+
+    /**
+     * Endpoint para actualizar un empleado existente.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<EmployeeResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestBody EmployeeRequest request) {
+        return ResponseEntity.ok(employeeService.update(id, request));
     }
 
     /**

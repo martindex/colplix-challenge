@@ -23,11 +23,37 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
 
     /**
-     * Guarda un nuevo empleado o actualiza uno existente basado en el email.
+     * Crea un nuevo empleado.
      */
-    public EmployeeResponse saveOrUpdate(EmployeeRequest request) {
-        Employee employee = employeeRepository.findByEmail(request.getEmail())
-                .orElse(new Employee());
+    public EmployeeResponse create(EmployeeRequest request) {
+        if (employeeRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("El email ya está registrado");
+        }
+
+        Employee employee = Employee.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .supervisorId(request.getSupervisorId())
+                .build();
+
+        Employee saved = employeeRepository.save(employee);
+        return mapToResponse(saved);
+    }
+
+    /**
+     * Actualiza un empleado existente.
+     */
+    public EmployeeResponse update(Long id, EmployeeRequest request) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
+        // Validar si el nuevo email ya existe en otro empleado
+        employeeRepository.findByEmail(request.getEmail())
+                .ifPresent(existing -> {
+                    if (!existing.getId().equals(id)) {
+                        throw new RuntimeException("El email ya está siendo usado por otro empleado");
+                    }
+                });
 
         employee.setName(request.getName());
         employee.setEmail(request.getEmail());

@@ -111,7 +111,7 @@
 					"response": []
 				},
 				{
-					"name": "Create/Update Employee",
+					"name": "Create Employee",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -142,6 +142,44 @@
 							"path": [
 								"api",
 								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Employee (ID 1)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Empleado Actualizado\",\n    \"email\": \"nuevo@colpix.com\",\n    \"supervisorId\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/employees/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"1"
 							]
 						}
 					},
