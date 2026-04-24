@@ -51,6 +51,20 @@ docker-compose up -d --build
 Una vez levantado el entorno, el entrevistador puede explorar y probar la API en:
 👉 **[http://localhost:48080/swagger-ui.html](http://localhost:48080/swagger-ui.html)**
 
+## 📊 Datos Pre-cargados y Pruebas Iniciales
+Para facilitar la revisión, el sistema inicializa automáticamente una jerarquía de empleados específica al primer arranque (ver `DataInitializer.java`).
+
+### Jerarquía de Prueba (Caso de Uso Principal)
+Se ha configurado una estructura de 8 empleados para validar la recursividad y el procesamiento paralelo:
+- **Empleado 1**: Es la raíz (CEO).
+    - Tiene **3 subordinados directos** (2, 3, 8).
+    - Tiene **3 subordinados indirectos** (5, 6 bajo el 2; y 7 bajo el 6).
+- **Resultado Esperado**: Al consultar `GET /api/employees/1`, el campo `reportsCount` debe ser **6**.
+
+### Credenciales de Acceso
+- **Usuario**: `admin`
+- **Password**: `admin123`
+
 ### Ejecución de Tests
 ```bash
 mvn clean test

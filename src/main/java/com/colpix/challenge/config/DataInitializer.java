@@ -10,8 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * Inicializador de datos para pruebas. 
- * Configura un usuario administrador y una estructura inicial de empleados.
+ * Inicializador de datos para el desafío técnico.
+ * Configura el usuario admin y la jerarquía de empleados solicitada.
  */
 @Component
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Crear usuario admin si no existe
+        // Inicializar usuario administrador
         if (userRepository.findByUsername("admin").isEmpty()) {
             User admin = User.builder()
                     .username("admin")
@@ -32,27 +32,35 @@ public class DataInitializer implements CommandLineRunner {
             userRepository.save(admin);
         }
 
-        // Crear estructura de empleados de prueba
+        // Inicializar jerarquía de empleados si la base de datos está vacía
         if (employeeRepository.count() == 0) {
-            Employee ceo = Employee.builder()
-                    .name("Elon Musk")
-                    .email("elon@colpix.com")
-                    .build();
-            ceo = employeeRepository.save(ceo);
+            // Nivel 1: Raíces
+            Employee emp1 = saveEmployee("Empleado 1", "emp1@colpix.com", null);
+            saveEmployee("Empleado 4", "emp4@colpix.com", null);
 
-            Employee manager = Employee.builder()
-                    .name("Gwynne Shotwell")
-                    .email("gwynne@colpix.com")
-                    .supervisorId(ceo.getId())
-                    .build();
-            manager = employeeRepository.save(manager);
+            // Nivel 2: Bajo Empleado 1
+            Employee emp2 = saveEmployee("Empleado 2", "emp2@colpix.com", emp1.getId());
+            saveEmployee("Empleado 3", "emp3@colpix.com", emp1.getId());
+            saveEmployee("Empleado 8", "emp8@colpix.com", emp1.getId());
 
-            Employee dev = Employee.builder()
-                    .name("John Doe")
-                    .email("john@colpix.com")
-                    .supervisorId(manager.getId())
-                    .build();
-            employeeRepository.save(dev);
+            // Nivel 3: Bajo Empleado 2
+            saveEmployee("Empleado 5", "emp5@colpix.com", emp2.getId());
+            Employee emp6 = saveEmployee("Empleado 6", "emp6@colpix.com", emp2.getId());
+
+            // Nivel 4: Bajo Empleado 6
+            saveEmployee("Empleado 7", "emp7@colpix.com", emp6.getId());
         }
+    }
+
+    /**
+     * Método auxiliar para persistir empleados de forma limpia.
+     */
+    private Employee saveEmployee(String name, String email, Long supervisorId) {
+        Employee employee = Employee.builder()
+                .name(name)
+                .email(email)
+                .supervisorId(supervisorId)
+                .build();
+        return employeeRepository.save(employee);
     }
 }
