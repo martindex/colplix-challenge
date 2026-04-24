@@ -30,7 +30,7 @@ public class AuthService {
         );
 
         var user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + request.getUsername()));
 
         var token = jwtService.generateToken(user);
 
