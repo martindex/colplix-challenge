@@ -10,9 +10,10 @@
     - Variables, Methods, and Classes must be in **English**.
     - Use **camelCase** for variables and methods.
     - Use **PascalCase** for classes and interfaces.
-- **Comments**: 
+- **Comments & Messages**: 
     - Comments must be in **Spanish**.
-    - Explain "why" rather than "what" when possible.
+    - Exception and error messages must be in **English**.
+    - Explain "why" rather than "what" when possible in comments.
 - **API Standards**:
     - Follow RESTful principles.
     - Use appropriate HTTP status codes.

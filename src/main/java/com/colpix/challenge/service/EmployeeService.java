@@ -3,6 +3,8 @@ package com.colpix.challenge.service;
 import com.colpix.challenge.dto.EmployeeDetailResponse;
 import com.colpix.challenge.dto.EmployeeRequest;
 import com.colpix.challenge.dto.EmployeeResponse;
+import com.colpix.challenge.exception.ConflictException;
+import com.colpix.challenge.exception.ResourceNotFoundException;
 import com.colpix.challenge.model.Employee;
 import com.colpix.challenge.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +29,10 @@ public class EmployeeService {
      */
     public EmployeeResponse create(EmployeeRequest request) {
         if (employeeRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("El email ya está registrado");
+            throw new ConflictException("Email already registered: " + request.getEmail());
         }
+
+        validateSupervisor(request.getSupervisorId());
 
         Employee employee = Employee.builder()
                 .name(request.getName())
@@ -45,15 +49,17 @@ public class EmployeeService {
      */
     public EmployeeResponse update(Long id, EmployeeRequest request) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with ID: " + id));
 
         // Validar si el nuevo email ya existe en otro empleado
         employeeRepository.findByEmail(request.getEmail())
                 .ifPresent(existing -> {
                     if (!existing.getId().equals(id)) {
-                        throw new RuntimeException("El email ya está siendo usado por otro empleado");
+                        throw new ConflictException("Email already in use by another employee: " + request.getEmail());
                     }
                 });
+
+        validateSupervisor(request.getSupervisorId());
 
         employee.setName(request.getName());
         employee.setEmail(request.getEmail());
@@ -77,7 +83,7 @@ public class EmployeeService {
      */
     public EmployeeDetailResponse getEmployeeDetail(Long id) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with ID: " + id));
 
         // Procesamiento en paralelo para obtener detalles y conteo de personal a cargo
         CompletableFuture<Long> reportsCountFuture = CompletableFuture.supplyAsync(() -> 
@@ -92,6 +98,15 @@ public class EmployeeService {
                 .updatedAt(employee.getUpdatedAt())
                 .reportsCount(reportsCountFuture.join())
                 .build();
+    }
+
+    /**
+     * Valida que el supervisor exista si se proporciona un ID.
+     */
+    private void validateSupervisor(Long supervisorId) {
+        if (supervisorId != null && !employeeRepository.existsById(supervisorId)) {
+            throw new ResourceNotFoundException("Supervisor not found with ID: " + supervisorId);
+        }
     }
 
     /**
