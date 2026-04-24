@@ -15,8 +15,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"var jsonData = JSON.parse(responseBody);",
-									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+									"var jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"token\", jsonData.token);"
 								],
 								"type": "text/javascript"
 							}

@@ -26,9 +26,7 @@ public class EmployeeService {
      * Guarda un nuevo empleado o actualiza uno existente basado en el email.
      */
     public EmployeeResponse saveOrUpdate(EmployeeRequest request) {
-        Employee employee = employeeRepository.findAll().stream()
-                .filter(e -> e.getEmail().equals(request.getEmail()))
-                .findFirst()
+        Employee employee = employeeRepository.findByEmail(request.getEmail())
                 .orElse(new Employee());
 
         employee.setName(request.getName());
